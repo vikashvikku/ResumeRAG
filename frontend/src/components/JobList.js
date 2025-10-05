@@ -9,11 +9,11 @@ import {
   Col,
   Badge,
   Accordion,
-  Alert,
 } from "react-bootstrap";
 import axios from "axios";
 
 const JobList = () => {
+  const API_URL = process.env.REACT_APP_API_URL; // ← Use environment variable here
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,7 +36,7 @@ const JobList = () => {
 
   const fetchJobs = async () => {
     try {
-      const response = await axios.get("/api/jobs");
+      const response = await axios.get(`${API_URL}/jobs`);
       setJobs(Array.isArray(response.data) ? response.data : []);
       setLoading(false);
     } catch (error) {
@@ -51,7 +51,7 @@ const JobList = () => {
     if (searchTerm.trim()) {
       setLoading(true);
       axios
-        .get(`/api/jobs/search/${searchTerm}`)
+        .get(`${API_URL}/jobs/search/${searchTerm}`)
         .then((response) => {
           setJobs(Array.isArray(response.data) ? response.data : []);
           setLoading(false);
@@ -78,12 +78,10 @@ const JobList = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Construct query parameters from filters
     const params = new URLSearchParams();
 
     Object.entries(advancedFilters).forEach(([key, value]) => {
       if (value) {
-        // For skills, split by comma and trim
         if (key === "skills" && value) {
           const skillsArray = value.split(",").map((skill) => skill.trim());
           params.append("skills", skillsArray.join(","));
@@ -94,7 +92,7 @@ const JobList = () => {
     });
 
     axios
-      .get(`/api/jobs/search/advanced?${params.toString()}`)
+      .get(`${API_URL}/jobs/search/advanced?${params.toString()}`)
       .then((response) => {
         setJobs(Array.isArray(response.data) ? response.data : []);
         setLoading(false);
@@ -109,7 +107,7 @@ const JobList = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this job?")) {
       try {
-        await axios.delete(`/api/jobs/${id}`);
+        await axios.delete(`${API_URL}/jobs/${id}`);
         setJobs(jobs.filter((job) => job._id !== id));
       } catch (error) {
         console.error("Error deleting job:", error);

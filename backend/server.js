@@ -23,7 +23,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/resumerag
 
 // Routes
 app.use('/api/resumes', resumeRoutes);
-app.use('/api/jobs', jobRoutes);
+app.use('/api/jobs', jobRoutes);  
 
 // Basic route
 app.get('/', (req, res) => {
