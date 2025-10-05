@@ -11,7 +11,7 @@ import {
 import axios from "axios";
 
 const ResumeList = () => {
-  const API_URL = process.env.REACT_APP_API_URL; // ← use environment variable
+  const API_URL = process.env.REACT_APP_API_URL; // ← environment variable
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -26,8 +26,8 @@ const ResumeList = () => {
       const response = await axios.get(`${API_URL}/resumes`);
       setResumes(Array.isArray(response.data) ? response.data : []);
       setLoading(false);
-    } catch (error) {
-      console.error("Error fetching resumes:", error);
+    } catch (err) {
+      console.error("Error fetching resumes:", err);
       setError("Failed to load resumes. Please try again later.");
       setLoading(false);
     }
@@ -47,8 +47,8 @@ const ResumeList = () => {
         `${API_URL}/resumes/search/${searchTerm}`
       );
       setResumes(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
-      console.error("Error searching resumes:", error);
+    } catch (err) {
+      console.error("Error searching resumes:", err);
       setError("Failed to search resumes. Please try again later.");
     } finally {
       setLoading(false);
@@ -62,6 +62,8 @@ const ResumeList = () => {
   if (error) {
     return <div className="alert alert-danger my-3">{error}</div>;
   }
+
+  const safeResumes = Array.isArray(resumes) ? resumes : [];
 
   return (
     <div>
@@ -92,17 +94,17 @@ const ResumeList = () => {
         </InputGroup>
       </Form>
 
-      {resumes.length === 0 ? (
+      {safeResumes.length === 0 ? (
         <div className="alert alert-info">No resumes found.</div>
       ) : (
         <Row>
-          {resumes.map((resume) => (
+          {safeResumes.map((resume) => (
             <Col md={6} lg={4} className="mb-4" key={resume._id}>
               <Card className="h-100">
                 <Card.Body>
-                  <Card.Title>{resume.name}</Card.Title>
+                  <Card.Title>{resume.name || "N/A"}</Card.Title>
                   <Card.Subtitle className="mb-2 text-muted">
-                    {resume.email}
+                    {resume.email || "N/A"}
                   </Card.Subtitle>
 
                   {resume.phone && (
@@ -111,7 +113,7 @@ const ResumeList = () => {
                     </Card.Text>
                   )}
 
-                  {resume.skills && resume.skills.length > 0 && (
+                  {Array.isArray(resume.skills) && resume.skills.length > 0 && (
                     <div className="mb-3">
                       <small className="text-muted">Skills:</small>
                       <br />
@@ -123,37 +125,39 @@ const ResumeList = () => {
                     </div>
                   )}
 
-                  {resume.experience && resume.experience.length > 0 && (
-                    <div className="mb-3">
-                      <small className="text-muted">Experience:</small>
-                      {resume.experience.map((exp, index) => (
-                        <div key={index} className="mb-1">
-                          <div>
-                            <strong>{exp.title}</strong> at {exp.company}
+                  {Array.isArray(resume.experience) &&
+                    resume.experience.length > 0 && (
+                      <div className="mb-3">
+                        <small className="text-muted">Experience:</small>
+                        {resume.experience.map((exp, index) => (
+                          <div key={index} className="mb-1">
+                            <div>
+                              <strong>{exp.title}</strong> at {exp.company}
+                            </div>
+                            <div>
+                              <small>{exp.duration}</small>
+                            </div>
                           </div>
-                          <div>
-                            <small>{exp.duration}</small>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
 
-                  {resume.education && resume.education.length > 0 && (
-                    <div className="mb-3">
-                      <small className="text-muted">Education:</small>
-                      {resume.education.map((edu, index) => (
-                        <div key={index} className="mb-1">
-                          <div>{edu.degree}</div>
-                          <div>
-                            <small>
-                              {edu.institution}, {edu.year}
-                            </small>
+                  {Array.isArray(resume.education) &&
+                    resume.education.length > 0 && (
+                      <div className="mb-3">
+                        <small className="text-muted">Education:</small>
+                        {resume.education.map((edu, index) => (
+                          <div key={index} className="mb-1">
+                            <div>{edu.degree}</div>
+                            <div>
+                              <small>
+                                {edu.institution}, {edu.year}
+                              </small>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
                 </Card.Body>
               </Card>
             </Col>
