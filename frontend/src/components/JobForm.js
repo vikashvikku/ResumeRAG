@@ -37,11 +37,10 @@ const JobForm = () => {
 
     setLoading(true);
 
-    const API_BASE_URL =
-      process.env.REACT_APP_API_URL || "http://localhost:5000";
+    const API_BASE_URL = process.env.REACT_APP_API_URL; // Already includes /api
 
     try {
-      await axios.post(`${API_BASE_URL}/api/jobs`, jobData);
+      await axios.post(`${API_BASE_URL}/jobs`, jobData);
 
       setMessage({ text: "Job posted successfully!", type: "success" });
 
