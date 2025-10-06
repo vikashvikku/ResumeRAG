@@ -1,6 +1,5 @@
 const Job = require("../models/Job");
 
-// Create a new job
 exports.createJob = async (req, res) => {
   try {
     const {
@@ -30,7 +29,6 @@ exports.createJob = async (req, res) => {
       requirements,
       experience,
     });
-
     await job.save();
     res.status(201).json(job);
   } catch (error) {
@@ -39,7 +37,6 @@ exports.createJob = async (req, res) => {
   }
 };
 
-// Get all jobs
 exports.getAllJobs = async (req, res) => {
   try {
     const jobs = await Job.find().sort({ createdAt: -1 });
@@ -50,13 +47,10 @@ exports.getAllJobs = async (req, res) => {
   }
 };
 
-// Get job by ID
 exports.getJobById = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
-    if (!job) {
-      return res.status(404).json({ message: "Job not found" });
-    }
+    if (!job) return res.status(404).json({ message: "Job not found" });
     res.json(job);
   } catch (error) {
     console.error("Error getting job:", error);
@@ -64,18 +58,13 @@ exports.getJobById = async (req, res) => {
   }
 };
 
-// Update job
 exports.updateJob = async (req, res) => {
   try {
     const job = await Job.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
-
-    if (!job) {
-      return res.status(404).json({ message: "Job not found" });
-    }
-
+    if (!job) return res.status(404).json({ message: "Job not found" });
     res.json(job);
   } catch (error) {
     console.error("Error updating job:", error);
@@ -83,15 +72,10 @@ exports.updateJob = async (req, res) => {
   }
 };
 
-// Delete job
 exports.deleteJob = async (req, res) => {
   try {
     const job = await Job.findByIdAndDelete(req.params.id);
-
-    if (!job) {
-      return res.status(404).json({ message: "Job not found" });
-    }
-
+    if (!job) return res.status(404).json({ message: "Job not found" });
     res.json({ message: "Job deleted successfully" });
   } catch (error) {
     console.error("Error deleting job:", error);
@@ -99,20 +83,16 @@ exports.deleteJob = async (req, res) => {
   }
 };
 
-// Search jobs (basic text search)
 exports.searchJobs = async (req, res) => {
   try {
     const query = req.params.query;
-
-    if (!query) {
+    if (!query)
       return res.status(400).json({ message: "Search query is required" });
-    }
 
     const jobs = await Job.find(
       { $text: { $search: query } },
       { score: { $meta: "textScore" } }
     ).sort({ score: { $meta: "textScore" } });
-
     res.json(jobs);
   } catch (error) {
     console.error("Error searching jobs:", error);
@@ -120,7 +100,6 @@ exports.searchJobs = async (req, res) => {
   }
 };
 
-// Advanced search jobs with filters
 exports.advancedSearchJobs = async (req, res) => {
   try {
     const {
@@ -133,7 +112,6 @@ exports.advancedSearchJobs = async (req, res) => {
       skills,
       experienceLevel,
     } = req.query;
-
     const searchQuery = {};
 
     if (title) searchQuery.title = { $regex: title, $options: "i" };
@@ -141,26 +119,21 @@ exports.advancedSearchJobs = async (req, res) => {
     if (location) searchQuery.location = { $regex: location, $options: "i" };
     if (jobType) searchQuery.jobType = jobType;
 
-    // Salary range
     if (minSalary || maxSalary) {
       searchQuery.salary = {};
       if (minSalary) searchQuery.salary.$gte = Number(minSalary);
       if (maxSalary) searchQuery.salary.$lte = Number(maxSalary);
     }
 
-    // Skills array
     if (skills) {
       const skillsArray = skills.split(",").map((skill) => skill.trim());
       searchQuery.skills = { $in: skillsArray };
     }
 
-    // Experience level
-    if (experienceLevel) {
+    if (experienceLevel)
       searchQuery.experience = { $regex: experienceLevel, $options: "i" };
-    }
 
     const jobs = await Job.find(searchQuery).sort({ createdAt: -1 });
-
     res.json(jobs);
   } catch (error) {
     console.error("Error in advanced job search:", error);

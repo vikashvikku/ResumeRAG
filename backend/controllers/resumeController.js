@@ -5,10 +5,9 @@ const resumeController = require("../controllers/resumeController");
 
 const router = express.Router();
 
-// Configure multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../uploads")); // uploads folder
+    cb(null, path.join(__dirname, "../uploads"));
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
@@ -17,7 +16,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Routes
 router.post("/upload", upload.single("resume"), resumeController.uploadResume);
 router.get("/", resumeController.getAllResumes);
 router.get("/:id", resumeController.getResumeById);

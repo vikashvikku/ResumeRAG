@@ -10,7 +10,6 @@ const ResumeUpload = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
 
-  // ✅ Use environment variable (works for local + vercel)
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
   const handleFileChange = (e) => {
@@ -34,18 +33,12 @@ const ResumeUpload = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/resumes/upload`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      await axios.post(`${API_URL}/resumes/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setMessage({
-        text: "Resume uploaded successfully!",
-        type: "success",
-      });
+      setMessage({ text: "Resume uploaded successfully!", type: "success" });
 
-      // Reset form
       setName("");
       setEmail("");
       setPhone("");

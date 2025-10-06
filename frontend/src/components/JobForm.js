@@ -19,16 +19,12 @@ const JobForm = () => {
   const [message, setMessage] = useState({ text: "", type: "" });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Convert comma-separated strings to arrays
     const jobData = {
       ...formData,
       requirements: formData.requirements
@@ -45,14 +41,10 @@ const JobForm = () => {
       process.env.REACT_APP_API_URL || "http://localhost:5000";
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/jobs`, jobData);
+      await axios.post(`${API_BASE_URL}/api/jobs`, jobData);
 
-      setMessage({
-        text: "Job posted successfully!",
-        type: "success",
-      });
+      setMessage({ text: "Job posted successfully!", type: "success" });
 
-      // Reset form
       setFormData({
         title: "",
         company: "",
@@ -92,98 +84,65 @@ const JobForm = () => {
       <Card>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Job Title</Form.Label>
-              <Form.Control
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="Enter job title"
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Company</Form.Label>
-              <Form.Control
-                type="text"
-                name="company"
-                value={formData.company}
-                onChange={handleChange}
-                placeholder="Enter company name"
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Location</Form.Label>
-              <Form.Control
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                placeholder="Enter job location"
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={4}
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Enter job description"
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Requirements (comma-separated)</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                name="requirements"
-                value={formData.requirements}
-                onChange={handleChange}
-                placeholder="Enter job requirements (separated by commas)"
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Skills (comma-separated)</Form.Label>
-              <Form.Control
-                type="text"
-                name="skills"
-                value={formData.skills}
-                onChange={handleChange}
-                placeholder="Enter required skills (separated by commas)"
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Experience</Form.Label>
-              <Form.Control
-                type="text"
-                name="experience"
-                value={formData.experience}
-                onChange={handleChange}
-                placeholder="Enter required experience (e.g., 2+ years)"
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Salary</Form.Label>
-              <Form.Control
-                type="text"
-                name="salary"
-                value={formData.salary}
-                onChange={handleChange}
-                placeholder="Enter salary range"
-              />
-            </Form.Group>
+            {[
+              {
+                label: "Job Title",
+                name: "title",
+                type: "text",
+                required: true,
+              },
+              {
+                label: "Company",
+                name: "company",
+                type: "text",
+                required: true,
+              },
+              { label: "Location", name: "location", type: "text" },
+              {
+                label: "Description",
+                name: "description",
+                type: "textarea",
+                rows: 4,
+                required: true,
+              },
+              {
+                label: "Requirements (comma-separated)",
+                name: "requirements",
+                type: "textarea",
+                rows: 3,
+              },
+              {
+                label: "Skills (comma-separated)",
+                name: "skills",
+                type: "text",
+              },
+              { label: "Experience", name: "experience", type: "text" },
+              { label: "Salary", name: "salary", type: "text" },
+            ].map((field, idx) => (
+              <Form.Group className="mb-3" key={idx}>
+                <Form.Label>{field.label}</Form.Label>
+                {field.type === "textarea" ? (
+                  <Form.Control
+                    as="textarea"
+                    rows={field.rows}
+                    name={field.name}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    placeholder={`Enter ${field.label.toLowerCase()}`}
+                    required={field.required || false}
+                  />
+                ) : (
+                  <Form.Control
+                    type={field.type}
+                    name={field.name}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    placeholder={`Enter ${field.label.toLowerCase()}`}
+                    required={field.required || false}
+                  />
+                )}
+              </Form.Group>
+            ))}
 
             <Form.Group className="mb-3">
               <Form.Label>Job Type</Form.Label>
