@@ -1,68 +1,74 @@
-import React, { useState } from 'react';
-import { Form, Button, Alert, Card } from 'react-bootstrap';
-import axios from 'axios';
+import React, { useState } from "react";
+import { Form, Button, Alert, Card } from "react-bootstrap";
+import axios from "axios";
 
 const JobForm = () => {
   const [formData, setFormData] = useState({
-    title: '',
-    company: '',
-    location: '',
-    description: '',
-    requirements: '',
-    skills: '',
-    experience: '',
-    salary: '',
-    jobType: 'Full-time'
+    title: "",
+    company: "",
+    location: "",
+    description: "",
+    requirements: "",
+    skills: "",
+    experience: "",
+    salary: "",
+    jobType: "Full-time",
   });
-  
+
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ text: '', type: '' });
+  const [message, setMessage] = useState({ text: "", type: "" });
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Convert comma-separated strings to arrays
     const jobData = {
       ...formData,
-      requirements: formData.requirements.split(',').map(item => item.trim()),
-      skills: formData.skills.split(',').map(item => item.trim())
+      requirements: formData.requirements
+        ? formData.requirements.split(",").map((item) => item.trim())
+        : [],
+      skills: formData.skills
+        ? formData.skills.split(",").map((item) => item.trim())
+        : [],
     };
-    
+
     setLoading(true);
-    
+
+    const API_BASE_URL =
+      process.env.REACT_APP_API_URL || "http://localhost:5000";
+
     try {
-      const response = await axios.post('/api/jobs', jobData);
-      
-      setMessage({ 
-        text: 'Job posted successfully!', 
-        type: 'success' 
+      const response = await axios.post(`${API_BASE_URL}/api/jobs`, jobData);
+
+      setMessage({
+        text: "Job posted successfully!",
+        type: "success",
       });
-      
+
       // Reset form
       setFormData({
-        title: '',
-        company: '',
-        location: '',
-        description: '',
-        requirements: '',
-        skills: '',
-        experience: '',
-        salary: '',
-        jobType: 'Full-time'
+        title: "",
+        company: "",
+        location: "",
+        description: "",
+        requirements: "",
+        skills: "",
+        experience: "",
+        salary: "",
+        jobType: "Full-time",
       });
-      
     } catch (error) {
-      console.error('Error posting job:', error);
-      setMessage({ 
-        text: error.response?.data?.message || 'Error posting job', 
-        type: 'danger' 
+      console.error("Error posting job:", error);
+      setMessage({
+        text: error.response?.data?.message || "Error posting job",
+        type: "danger",
       });
     } finally {
       setLoading(false);
@@ -72,13 +78,17 @@ const JobForm = () => {
   return (
     <div>
       <h2 className="mb-4">Post a Job</h2>
-      
+
       {message.text && (
-        <Alert variant={message.type} dismissible onClose={() => setMessage({ text: '', type: '' })}>
+        <Alert
+          variant={message.type}
+          dismissible
+          onClose={() => setMessage({ text: "", type: "" })}
+        >
           {message.text}
         </Alert>
       )}
-      
+
       <Card>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
@@ -93,7 +103,7 @@ const JobForm = () => {
                 required
               />
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
               <Form.Label>Company</Form.Label>
               <Form.Control
@@ -105,7 +115,7 @@ const JobForm = () => {
                 required
               />
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
               <Form.Label>Location</Form.Label>
               <Form.Control
@@ -116,7 +126,7 @@ const JobForm = () => {
                 placeholder="Enter job location"
               />
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
               <Form.Control
@@ -129,7 +139,7 @@ const JobForm = () => {
                 required
               />
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
               <Form.Label>Requirements (comma-separated)</Form.Label>
               <Form.Control
@@ -141,7 +151,7 @@ const JobForm = () => {
                 placeholder="Enter job requirements (separated by commas)"
               />
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
               <Form.Label>Skills (comma-separated)</Form.Label>
               <Form.Control
@@ -152,7 +162,7 @@ const JobForm = () => {
                 placeholder="Enter required skills (separated by commas)"
               />
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
               <Form.Label>Experience</Form.Label>
               <Form.Control
@@ -163,7 +173,7 @@ const JobForm = () => {
                 placeholder="Enter required experience (e.g., 2+ years)"
               />
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
               <Form.Label>Salary</Form.Label>
               <Form.Control
@@ -174,7 +184,7 @@ const JobForm = () => {
                 placeholder="Enter salary range"
               />
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
               <Form.Label>Job Type</Form.Label>
               <Form.Select
@@ -189,9 +199,9 @@ const JobForm = () => {
                 <option value="Remote">Remote</option>
               </Form.Select>
             </Form.Group>
-            
+
             <Button variant="primary" type="submit" disabled={loading}>
-              {loading ? 'Posting...' : 'Post Job'}
+              {loading ? "Posting..." : "Post Job"}
             </Button>
           </Form>
         </Card.Body>
